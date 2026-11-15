@@ -1,0 +1,335 @@
+{
+  "profile": {
+    "editors": [
+      {
+        "id": "rb_zone_state",
+        "ranges": [
+          {
+            "uom": "25",
+            "subset": "0,1",
+            "names": {
+              "0": "Off",
+              "1": "Running"
+            }
+          }
+        ]
+      },
+      {
+        "id": "rb_unit_state",
+        "ranges": [
+          {
+            "uom": "25",
+            "subset": "0,1",
+            "names": {
+              "0": "Idle",
+              "1": "Watering"
+            }
+          }
+        ]
+      },
+      {
+        "id": "rb_rain_sensor",
+        "ranges": [
+          {
+            "uom": "25",
+            "subset": "0,1",
+            "names": {
+              "0": "Clear",
+              "1": "Rain Detected"
+            }
+          }
+        ]
+      },
+      {
+        "id": "rb_run_minutes",
+        "ranges": [
+          {
+            "uom": "45",
+            "min": 1,
+            "max": 240,
+            "step": 1,
+            "prec": 0
+          }
+        ]
+      },
+      {
+        "id": "rb_delay_days",
+        "ranges": [
+          {
+            "uom": "10",
+            "min": 0,
+            "max": 14,
+            "step": 1,
+            "prec": 0
+          }
+        ]
+      },
+      {
+        "id": "rb_budget_pct",
+        "ranges": [
+          {
+            "uom": "51",
+            "min": 0,
+            "max": 200,
+            "step": 1,
+            "prec": 0
+          }
+        ]
+      },
+      {
+        "id": "rb_program",
+        "ranges": [
+          {
+            "uom": "25",
+            "subset": "0,1,2,3",
+            "names": {
+              "0": "Program A",
+              "1": "Program B",
+              "2": "Program C",
+              "3": "Program D"
+            }
+          }
+        ]
+      },
+      {
+        "id": "ED_CONTROLLER_ST",
+        "ranges": [
+          {
+            "subset": "0,1",
+            "uom": "25",
+            "names": {
+              "0": "Not Connected",
+              "1": "Connected"
+            }
+          }
+        ]
+      }
+    ],
+    "nodedefs": [
+      {
+        "id": "controller",
+        "name": "Rain Bird Plugin",
+        "properties": [
+          {
+            "id": "ST",
+            "name": "Status",
+            "editor": "ED_CONTROLLER_ST"
+          }
+        ],
+        "cmds": {
+          "sends": [],
+          "accepts": [
+            {
+              "id": "DISCOVER",
+              "name": "Discover",
+              "native": "false"
+            }
+          ]
+        },
+        "links": {
+          "ctl": [],
+          "rsp": []
+        }
+      },
+      {
+        "id": "rbunit",
+        "name": "Rain Bird Controller",
+        "properties": [
+          {
+            "id": "ST",
+            "name": "Watering",
+            "editor": "rb_unit_state"
+          },
+          {
+            "id": "DELAY",
+            "name": "Rain Delay",
+            "editor": "rb_delay_days"
+          },
+          {
+            "id": "RAIN_SENSOR",
+            "name": "Rain Sensor",
+            "editor": "rb_rain_sensor"
+          },
+          {
+            "id": "WATER_BUDGET",
+            "name": "Water Budget",
+            "editor": "rb_budget_pct"
+          }
+        ],
+        "cmds": {
+          "sends": [],
+          "accepts": [
+            {
+              "id": "STOP_ALL",
+              "name": "Stop All Watering",
+              "native": "false"
+            },
+            {
+              "id": "SET_DELAY",
+              "name": "Set Rain Delay",
+              "native": "false",
+              "parameters": [
+                {
+                  "id": "",
+                  "editor": "rb_delay_days",
+                  "optional": false,
+                  "init": "DELAY"
+                }
+              ]
+            },
+            {
+              "id": "RUN_PROGRAM",
+              "name": "Run Program",
+              "native": "false",
+              "parameters": [
+                {
+                  "id": "",
+                  "editor": "rb_program",
+                  "optional": false
+                }
+              ]
+            }
+          ]
+        },
+        "links": {
+          "ctl": [],
+          "rsp": []
+        }
+      },
+      {
+        "id": "rbzone",
+        "name": "Rain Bird Zone",
+        "properties": [
+          {
+            "id": "ST",
+            "name": "Zone State",
+            "editor": "rb_zone_state"
+          },
+          {
+            "id": "DUR",
+            "name": "Run Time",
+            "editor": "rb_run_minutes"
+          }
+        ],
+        "cmds": {
+          "sends": [
+            {
+              "id": "DON",
+              "name": "On",
+              "native": "true"
+            },
+            {
+              "id": "DOF",
+              "name": "Off",
+              "native": "true"
+            }
+          ],
+          "accepts": [
+            {
+              "id": "DON",
+              "name": "Run Zone",
+              "native": "true",
+              "parameters": [
+                {
+                  "id": "",
+                  "editor": "rb_run_minutes",
+                  "optional": true,
+                  "init": "DUR"
+                }
+              ]
+            },
+            {
+              "id": "DOF",
+              "name": "Stop Watering",
+              "native": "true"
+            },
+            {
+              "id": "SET_DUR",
+              "name": "Set Run Time",
+              "native": "false",
+              "parameters": [
+                {
+                  "id": "",
+                  "editor": "rb_run_minutes",
+                  "optional": false,
+                  "init": "DUR"
+                }
+              ]
+            }
+          ]
+        },
+        "links": {
+          "ctl": [],
+          "rsp": []
+        }
+      }
+    ],
+    "linkdefs": []
+  },
+  "server_entry": {
+    "name": "Rain Bird",
+    "desc": "Local-network control of Rain Bird sprinkler controllers (ESP-Me and other LNK WiFi models) using the pyrainbird library: zone on/off with run time, stop all, rain delay, rain sensor, water budget (read-only) and program start.",
+    "type": "python3",
+    "executable": "main.py",
+    "discover": true,
+    "shortPoll": 30,
+    "longPoll": 300,
+    "isyAccess": false,
+    "requireEisyui": false,
+    "authorize": false,
+    "ai_enabled": false,
+    "webhook_enabled": false,
+    "fileUpload": false,
+    "customParams": {
+      "host": "",
+      "password": ""
+    },
+    "extra_requirements": [
+      "pyrainbird>=6.0.2"
+    ]
+  },
+  "readme_body": "# Rain Bird for eisy / IoX\n\nLocal-network control of Rain Bird sprinkler controllers through the Rain Bird WiFi module (**LNK**). Built on the open-source [`pyrainbird`](https://github.com/allenporter/pyrainbird) library (MIT). It talks directly to the controller's IP address - no Rain Bird cloud account is involved. Developed for an **ESP-Me**; other controllers that use the same protocol (ESP-TM2, ESP-ME3, ...) may work too, but only an ESP-TM2 is listed as fully verified by the library authors.\n\n> **LNK2 modules:** the released `pyrainbird` 6.0.2 only speaks plain HTTP (LNK). LNK2 modules need HTTPS, which only newer, unreleased library code supports. When a newer release is published the plugin will use it automatically (`create_controller`).\n\n## Settings\n\nOnly two: **host** (the WiFi module's IP address) and **password**. There is no user name or email.\n\n## What you get\n\n**Rain Bird Plugin** (controller node): connection status and a *Discover* command.\n\n**Rain Bird <model>** (one node):\n| Property | Meaning |\n|---|---|\n| Watering | Idle / Watering (any zone running) |\n| Rain Delay | days remaining |\n| Rain Sensor | Clear / Rain Detected |\n| Water Budget | seasonal adjust, % (read-only) |\n\nCommands: *Stop All Watering*, *Set Rain Delay* (0-14 days), *Run Program* (A-D).\n\n**One node per zone**, named with the names you enter in the configuration:\n| Property | Meaning |\n|---|---|\n| Zone State | Off / Running |\n| Run Time | minutes used when the zone is turned on (1-240) |\n\nCommands: *On / Run Zone* (optional minutes, defaults to the node's Run Time), *Off / Stop Watering*, *Set Run Time*.\n\n## Setup\n\n1. Install the plugin and open its configuration page.\n2. Enter **host** (reserve the address in your router) and **password** (the one from the Rain Bird app).\n3. Optionally add rows under **Zone names**.\n4. Restart the plugin if nodes do not appear; then press *Discover*.\n\n## Good to know\n\n* The controller handles **one client at a time**. Opening the Rain Bird app while the plugin is polling can cause a brief \"busy\" message; the plugin retries up to 3 times.\n* Zone status polls every 30 s; rain delay, rain sensor and water budget every 5 min.\n* The Rain Bird protocol can only *stop all* watering, so a zone's *Off* command stops watering only if that zone is currently running.\n* **Safety pauses** (shown as a notice on the plugin page): a rejected password pauses polling until you save the configuration; 3 undecodable replies in a row (usually a wrong password) pause for 16 minutes; 3 network failures in a row pause for 2 minutes.\n* On every start the plugin removes any banner it did not create itself and names its controller node \"Rain Bird Plugin\", so leftovers from another plugin that previously used the same slot disappear.\n* Water budget is read from program A. Changing it is not supported by the released library - use the Rain Bird app.\n* Program letters A-D are sent as program numbers 0-3 (not verified against hardware - check on first use).\n* Schedules/programs themselves are not edited by this plugin.\n\n## Requirements\n\n`pyrainbird>=6.0.2` (installed automatically).\n",
+  "override_bodies": {
+    "start": "    def start(self):\n        import rainbird_nodes as rb\n        rb.LOGGER.info('Rain Bird plugin starting')\n        rb.cleanup_foreign(self.poly, self)\n        rb._S['started'] = True\n        rb.bootstrap(self.poly, self.address)\n",
+    "stop": "    def stop(self):\n        import rainbird_nodes as rb\n        rb.LOGGER.info('Rain Bird plugin stopping')\n        rb._S['started'] = False\n        rb.shutdown()\n",
+    "discover": "    def discover(self, *args, **kwargs):\n        import rainbird_nodes as rb\n        rb.bootstrap(self.poly, self.address)\n",
+    "shortPoll": "    def shortPoll(self, *args, **kwargs):\n        import rainbird_nodes as rb\n        rb.poll_fast(self.poly, self.address)\n",
+    "longPoll": "    def longPoll(self, *args, **kwargs):\n        import rainbird_nodes as rb\n        rb.poll_slow(self.poly, self.address)\n",
+    "parameterHandler": "    def parameterHandler(self, params):\n        import threading\n        import rainbird_nodes as rb\n        params = params or {}\n        host = str(params.get('host') or '').strip()\n        password = str(params.get('password') or '')\n        changed = rb.configure(self.poly, host, password)\n        if changed and rb._S['started'] and host and password:\n            threading.Thread(target=rb.bootstrap, args=(self.poly, self.address), daemon=True).start()\n",
+    "customTypedDataHandler": "    def customTypedDataHandler(self, custom_params):\n        import rainbird_nodes as rb\n        self.CustomTypedData.load(custom_params)\n        rb.set_zone_names(self.poly, custom_params)\n"
+  },
+  "node_classes": {
+    "rainbird_nodes": "\"\"\"Rain Bird plugin: device nodes plus a small bridge to the async pyrainbird library.\n\npyrainbird is asyncio based while udi_interface is thread/callback based, so every\nlibrary call runs on one private event-loop thread and is serialised with a lock\n(the Rain Bird controller only talks to one client at a time).\n\"\"\"\n\nimport asyncio\nimport threading\nimport time\n\nimport udi_interface\nfrom udi_interface import Node\n\nLOGGER = udi_interface.LOGGER\n\nUNIT_ADDR = 'rbunit'\nNOTICE_KEY = 'rainbird'\nOWN_NOTICE_KEYS = ('config', NOTICE_KEY)\nCONTROLLER_NAME = 'Rain Bird Plugin'\nMAX_RAIN_DELAY_DAYS = 14\nMAX_RUN_MINUTES = 240\nBUSY_ATTEMPTS = 3\nBUSY_WAIT_SECONDS = 2\nFAILURES_BEFORE_PAUSE = 3\nPASSWORD_PAUSE_SECONDS = 16 * 60\nNETWORK_PAUSE_SECONDS = 2 * 60\n\n_S = {\n    'loop': None,\n    'session': None,\n    'ctrl': None,\n    'host': '',\n    'password': '',\n    'blocked_until': 0.0,\n    'pending_notice': None,\n    'fail_pw': 0,\n    'fail_net': 0,\n    'lock': threading.RLock(),\n    'boot_lock': threading.Lock(),\n    'started': False,\n    'reset': False,\n    'error_shown': False,\n    'zones': [],\n    'names': {},\n    'nodes': {},\n    'max_programs': 4,\n}\n\n\n# --------------------------------------------------------------------------\n# small helpers\n# --------------------------------------------------------------------------\n\ndef zone_address(zone):\n    return 'zone%d' % int(zone)\n\n\ndef zone_name(zone):\n    return _S['names'].get(int(zone)) or ('Zone %d' % int(zone))\n\n\ndef _clamp(value, low, high):\n    return max(low, min(high, value))\n\n\ndef _cmd_int(command):\n    \"\"\"Pull the single numeric parameter out of an IoX command dict.\"\"\"\n    if not command:\n        return None\n    value = command.get('value')\n    if value is None:\n        query = command.get('query') or {}\n        if '' in query:\n            value = query['']\n        elif query:\n            value = next(iter(query.values()))\n    try:\n        return int(float(value))\n    except (TypeError, ValueError):\n        return None\n\n\ndef _blocked():\n    return time.time() < _S['blocked_until']\n\n\ndef _notice(poly, key, text=None):\n    try:\n        if text is None:\n            poly.Notices.delete(key)\n        else:\n            poly.Notices[key] = text\n    except Exception as ex:\n        LOGGER.debug('Notice %s update ignored: %s', key, ex)\n\n\ndef cleanup_foreign(poly, controller):\n    \"\"\"Remove leftovers of a previous plugin that used this slot.\n\n    Deletes every banner this plugin did not create and gives the controller\n    node this plugin's own name.\n    \"\"\"\n    try:\n        for key in list(poly.Notices.keys()):\n            if key not in OWN_NOTICE_KEYS:\n                LOGGER.info('Removing stale notice %r left by a previous plugin', key)\n                poly.Notices.delete(key)\n    except Exception as ex:\n        LOGGER.debug('Stale notice cleanup ignored: %s', ex)\n    try:\n        if controller.name != CONTROLLER_NAME:\n            LOGGER.info('Renaming controller node %r to %r', controller.name, CONTROLLER_NAME)\n            try:\n                controller.rename(CONTROLLER_NAME)\n            except AttributeError:\n                poly.renameNode(controller.address, CONTROLLER_NAME)\n            controller.name = CONTROLLER_NAME\n    except Exception as ex:\n        LOGGER.error('Could not rename controller node: %s', ex)\n\n\n# --------------------------------------------------------------------------\n# asyncio bridge to pyrainbird\n# --------------------------------------------------------------------------\n\ndef _loop():\n    if _S['loop'] is None:\n        loop = asyncio.new_event_loop()\n        thread = threading.Thread(target=loop.run_forever, name='rainbird-loop', daemon=True)\n        thread.start()\n        _S['loop'] = loop\n    return _S['loop']\n\n\ndef _run(coro, timeout=60):\n    future = asyncio.run_coroutine_threadsafe(coro, _loop())\n    try:\n        return future.result(timeout)\n    except Exception:\n        future.cancel()\n        raise\n\n\nasync def _aconnect():\n    import aiohttp\n    from pyrainbird import async_client\n\n    if _S['session'] is None or _S['session'].closed:\n        _S['session'] = aiohttp.ClientSession()\n    factory = getattr(async_client, 'create_controller', None)  # newer releases only\n    if factory is not None:\n        controller = await factory(_S['session'], _S['host'], _S['password'])\n    else:\n        controller = async_client.CreateController(_S['session'], _S['host'], _S['password'])\n    # Probe right away so a wrong IP/password shows up immediately (result is cached by the library).\n    await controller.get_model_and_version()\n    return controller\n\n\nasync def _aclose():\n    session = _S['session']\n    _S['session'] = None\n    if session is not None and not session.closed:\n        await session.close()\n\n\ndef configure(poly, host, password):\n    \"\"\"Store connection settings. Returns True when they changed.\"\"\"\n    changed = (host != _S['host']) or (password != _S['password'])\n    _S['host'] = host\n    _S['password'] = password\n    if changed:\n        _S['reset'] = True\n        _S['blocked_until'] = 0.0\n        _S['pending_notice'] = None\n        _S['fail_pw'] = 0\n        _S['fail_net'] = 0\n        _S['zones'] = []\n        clear_error(poly)\n    if host and password:\n        _notice(poly, 'config')\n    else:\n        _notice(poly, 'config', 'Enter the Rain Bird controller IP address and password in the plugin configuration.')\n    return changed\n\n\ndef shutdown():\n    try:\n        with _S['lock']:\n            _S['ctrl'] = None\n            _run(_aclose(), 10)\n    except Exception as ex:\n        LOGGER.debug('Rain Bird shutdown: %s', ex)\n\n\ndef _classify(err):\n    \"\"\"Sort a failure into: auth, password, busy, bug or network.\"\"\"\n    names = {c.__name__ for c in type(err).__mro__}\n    if names & {'RainbirdAuthException', 'RainbirdAuthLockoutException'}:\n        return 'auth'\n    if 'RainbirdCodingException' in names:\n        return 'password'  # reply could not be decoded: usually a wrong password\n    if 'RainbirdDeviceBusyException' in names:\n        return 'busy'\n    if isinstance(err, (AttributeError, TypeError, ValueError, KeyError)):\n        return 'bug'\n    return 'network'  # generic API error, timeout, connection problem\n\n\ndef _block(until, text):\n    _S['blocked_until'] = until\n    _S['pending_notice'] = text\n    _S['ctrl'] = None\n\n\ndef _record_failure(kind):\n    now = time.time()\n    if kind == 'auth':\n        _block(float('inf'),\n               'The Rain Bird controller rejected the password. Correct it in the plugin configuration '\n               'and save. Polling is paused until then so the controller is not locked out.')\n    elif kind == 'password':\n        _S['fail_pw'] += 1\n        if _S['fail_pw'] >= FAILURES_BEFORE_PAUSE:\n            _S['fail_pw'] = FAILURES_BEFORE_PAUSE - 1  # one more failure after the pause re-pauses\n            _block(now + PASSWORD_PAUSE_SECONDS,\n                   'The Rain Bird controller keeps sending replies the plugin cannot read - this usually '\n                   'means the password is wrong. Polling is paused for 16 minutes to avoid a lockout. '\n                   'Check the password in the plugin configuration and save.')\n    elif kind == 'network':\n        _S['fail_net'] += 1\n        if _S['fail_net'] >= FAILURES_BEFORE_PAUSE:\n            _S['fail_net'] = FAILURES_BEFORE_PAUSE - 1\n            _block(now + NETWORK_PAUSE_SECONDS,\n                   'Cannot reach the Rain Bird controller at %s. Check the IP address and that the WiFi '\n                   'module is online. The plugin will retry in 2 minutes.' % _S['host'])\n\n\ndef call(method, *args):\n    \"\"\"Run one pyrainbird controller coroutine, one at a time. Raises on failure.\"\"\"\n    with _S['lock']:\n        if not _S['host'] or not _S['password']:\n            raise RuntimeError('Rain Bird host/password not configured yet')\n        if _blocked():\n            raise RuntimeError('Rain Bird access is paused')\n        if _S['reset']:\n            _S['reset'] = False\n            _S['ctrl'] = None\n            try:\n                _run(_aclose(), 10)\n            except Exception as ex:\n                LOGGER.debug('Closing old Rain Bird session: %s', ex)\n        attempts = 0\n        while True:\n            attempts += 1\n            try:\n                if _S['ctrl'] is None:\n                    _S['ctrl'] = _run(_aconnect(), 60)\n                result = _run(getattr(_S['ctrl'], method)(*args), 60)\n                _S['fail_pw'] = 0\n                _S['fail_net'] = 0\n                return result\n            except Exception as err:\n                kind = _classify(err)\n                if kind == 'busy' and attempts < BUSY_ATTEMPTS:\n                    LOGGER.info('Rain Bird controller busy, retrying (%d/%d)', attempts, BUSY_ATTEMPTS)\n                    time.sleep(BUSY_WAIT_SECONDS)\n                    continue\n                _record_failure(kind)\n                raise\n\n\ndef handle_error(poly, err):\n    if _S['pending_notice']:\n        _notice(poly, NOTICE_KEY, _S['pending_notice'])\n        LOGGER.error('Rain Bird paused polling: %s', _S['pending_notice'])\n        _S['pending_notice'] = None\n        _S['error_shown'] = True\n        return\n    if isinstance(err, RuntimeError):\n        LOGGER.warning('%s', err)\n        return\n    kind = _classify(err)\n    if kind == 'busy':\n        LOGGER.warning('Rain Bird controller is busy (another app talking to it?); will retry next poll')\n    elif kind == 'bug':\n        LOGGER.error('Rain Bird plugin or pyrainbird mismatch (%s): %s', type(err).__name__, err)\n    elif kind == 'password':\n        LOGGER.warning('Rain Bird reply could not be decoded (wrong password?) %d/%d',\n                       _S['fail_pw'], FAILURES_BEFORE_PAUSE)\n    else:\n        LOGGER.warning('Rain Bird communication problem (%s): %s', type(err).__name__, err)\n\n\ndef clear_error(poly):\n    if _S['error_shown']:\n        _notice(poly, NOTICE_KEY)\n        _S['error_shown'] = False\n\n\ndef _safe(poly, fn):\n    try:\n        fn(poly)\n        clear_error(poly)\n        return True\n    except Exception as ex:\n        handle_error(poly, ex)\n        return False\n\n\ndef run_action(poly, label, method, *args):\n    try:\n        call(method, *args)\n        LOGGER.info('Rain Bird: %s ok', label)\n        return True\n    except Exception as ex:\n        LOGGER.error('Rain Bird: %s failed', label)\n        handle_error(poly, ex)\n        return False\n\n\n# --------------------------------------------------------------------------\n# discovery, naming and status updates\n# --------------------------------------------------------------------------\n\ndef discover_nodes(poly, primary):\n    info = call('get_model_and_version')\n    model_name = getattr(info, 'model_name', None) or 'Rain Bird'\n    try:\n        programs = int(info.model_info.max_programs)\n        if programs > 0:\n            _S['max_programs'] = programs\n    except Exception:\n        pass\n    LOGGER.info('Rain Bird model: %s', model_name)\n\n    stations = call('get_available_stations')\n    zones = sorted(int(z) for z in stations.active_set)\n    _S['zones'] = zones\n    LOGGER.info('Rain Bird zones available: %s', zones)\n\n    unit = RainbirdUnit(poly, primary, UNIT_ADDR, poly.getValidName('Rain Bird %s' % model_name))\n    poly.addNode(unit)\n    _S['nodes'][UNIT_ADDR] = unit\n    for zone in zones:\n        address = zone_address(zone)\n        node = RainbirdZone(poly, primary, address, poly.getValidName(zone_name(zone)), zone)\n        poly.addNode(node)\n        _S['nodes'][address] = node\n\n\ndef set_zone_names(poly, data):\n    \"\"\"Apply the customer's typed zone-name list and rename existing zone nodes.\"\"\"\n    names = {}\n    try:\n        entries = (data or {}).get('zone_names') or []\n        for entry in entries:\n            zone = int(float(entry.get('zone')))\n            name = str(entry.get('name') or '').strip()\n            if name:\n                names[zone] = name\n    except Exception as ex:\n        LOGGER.error('Could not read zone names: %s', ex)\n    _S['names'] = names\n    for zone in list(_S['zones']):\n        node = _S['nodes'].get(zone_address(zone))\n        if node is None:\n            continue\n        wanted = poly.getValidName(zone_name(zone))\n        if node.name == wanted:\n            continue\n        try:\n            try:\n                node.rename(wanted)\n            except AttributeError:\n                poly.renameNode(node.address, wanted)\n            node.name = wanted\n        except Exception as ex:\n            LOGGER.error('Could not rename %s to %s: %s', node.address, wanted, ex)\n\n\ndef update_fast(poly):\n    states = call('get_zone_states')\n    active = set(int(z) for z in states.active_set)\n    for zone in _S['zones']:\n        node = _S['nodes'].get(zone_address(zone))\n        if node is not None:\n            node.setDriver('ST', 1 if zone in active else 0)\n    unit = _S['nodes'].get(UNIT_ADDR)\n    if unit is not None:\n        unit.setDriver('ST', 1 if active else 0)\n\n\ndef update_slow(poly):\n    unit = _S['nodes'].get(UNIT_ADDR)\n    if unit is None:\n        return\n    first_error = None\n    try:\n        unit.setDriver('DELAY', int(call('get_rain_delay')))\n    except Exception as ex:\n        first_error = first_error or ex\n    try:\n        unit.setDriver('RAIN_SENSOR', 1 if call('get_rain_sensor_state') else 0)\n    except Exception as ex:\n        first_error = first_error or ex\n    try:\n        budget = call('water_budget', 0)\n        unit.setDriver('WATER_BUDGET', int(budget.adjust))\n    except Exception as ex:\n        first_error = first_error or ex\n    if first_error is not None:\n        raise first_error\n\n\ndef bootstrap(poly, primary):\n    \"\"\"Connect, (re)create nodes and read everything once.\"\"\"\n    if not _S['boot_lock'].acquire(False):\n        return\n    try:\n        if not _S['host'] or not _S['password']:\n            return\n        discover_nodes(poly, primary)\n        update_fast(poly)\n        try:\n            update_slow(poly)\n        except Exception as ex:\n            handle_error(poly, ex)\n        clear_error(poly)\n    except Exception as ex:\n        handle_error(poly, ex)\n        if not _S['error_shown'] and not isinstance(ex, RuntimeError):\n            _notice(poly, NOTICE_KEY,\n                    'Could not connect to the Rain Bird controller at %s. Check the IP address and '\n                    'password in the plugin configuration (see the plugin log for details).' % _S['host'])\n            _S['error_shown'] = True\n    finally:\n        _S['boot_lock'].release()\n\n\ndef poll_fast(poly, primary):\n    if not _S['started'] or not _S['host'] or _blocked():\n        return\n    if not _S['zones']:\n        bootstrap(poly, primary)\n        return\n    _safe(poly, update_fast)\n\n\ndef poll_slow(poly, primary):\n    if not _S['started'] or not _S['host'] or _blocked():\n        return\n    if not _S['zones']:\n        bootstrap(poly, primary)\n        return\n    _safe(poly, update_slow)\n\n\n# --------------------------------------------------------------------------\n# nodes\n# --------------------------------------------------------------------------\n\nclass RainbirdUnit(Node):\n    \"\"\"The Rain Bird controller itself: rain delay, rain sensor, water budget, programs.\"\"\"\n\n    id = 'rbunit'\n    drivers = [\n        {'driver': 'ST', 'value': 0, 'uom': 25, 'name': 'Watering'},\n        {'driver': 'DELAY', 'value': 0, 'uom': 10, 'name': 'Rain Delay'},\n        {'driver': 'RAIN_SENSOR', 'value': 0, 'uom': 25, 'name': 'Rain Sensor'},\n        {'driver': 'WATER_BUDGET', 'value': 100, 'uom': 51, 'name': 'Water Budget'},\n    ]\n\n    def stop_all(self, command=None):\n        if run_action(self.poly, 'stop all watering', 'stop_irrigation'):\n            _safe(self.poly, update_fast)\n\n    def set_delay(self, command=None):\n        days = _cmd_int(command)\n        if days is None:\n            return\n        days = _clamp(days, 0, MAX_RAIN_DELAY_DAYS)\n        if run_action(self.poly, 'set rain delay %d days' % days, 'set_rain_delay', days):\n            self.setDriver('DELAY', days)\n\n    def run_program(self, command=None):\n        program = _cmd_int(command)\n        if program is None:\n            return\n        program = _clamp(program, 0, max(0, _S['max_programs'] - 1))\n        if run_action(self.poly, 'run program %d' % program, 'set_program', program):\n            _safe(self.poly, update_fast)\n\n    commands = {\n        'STOP_ALL': stop_all,\n        'SET_DELAY': set_delay,\n        'RUN_PROGRAM': run_program,\n    }\n\n\nclass RainbirdZone(Node):\n    \"\"\"One sprinkler zone (station).\"\"\"\n\n    id = 'rbzone'\n    drivers = [\n        {'driver': 'ST', 'value': 0, 'uom': 25, 'name': 'Zone State'},\n        {'driver': 'DUR', 'value': 10, 'uom': 45, 'name': 'Run Time'},\n    ]\n\n    def __init__(self, polyglot, primary, address, name, zone):\n        super().__init__(polyglot, primary, address, name)\n        self.zone = int(zone)\n\n    def don(self, command=None):\n        minutes = _cmd_int(command)\n        if minutes is None:\n            try:\n                minutes = int(float(self.getDriver('DUR')))\n            except (TypeError, ValueError):\n                minutes = 10\n        minutes = _clamp(minutes, 1, MAX_RUN_MINUTES)\n        self.setDriver('DUR', minutes)\n        if run_action(self.poly, 'run zone %d for %d min' % (self.zone, minutes),\n                      'irrigate_zone', self.zone, minutes):\n            _safe(self.poly, update_fast)\n\n    def dof(self, command=None):\n        # The controller can only stop everything, so only do so if this zone is running.\n        try:\n            states = call('get_zone_states')\n            if self.zone in set(int(z) for z in states.active_set):\n                call('stop_irrigation')\n                LOGGER.info('Rain Bird: stopped watering (zone %d was running)', self.zone)\n        except Exception as ex:\n            handle_error(self.poly, ex)\n            return\n        _safe(self.poly, update_fast)\n\n    def set_dur(self, command=None):\n        minutes = _cmd_int(command)\n        if minutes is None:\n            return\n        self.setDriver('DUR', _clamp(minutes, 1, MAX_RUN_MINUTES))\n\n    commands = {\n        'DON': don,\n        'DOF': dof,\n        'SET_DUR': set_dur,\n    }\n"
+  },
+  "tests": {
+    "test_rainbird_nodes.py": "import os\nimport sys\nimport time\n\nsys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n\nimport rainbird_nodes as rb  # noqa: E402\n\n\nclass FakePoly:\n    def getValidName(self, name):\n        return name\n\n\ndef _reset():\n    rb._S.update(blocked_until=0.0, pending_notice=None, fail_pw=0, fail_net=0,\n                 ctrl=None, reset=False, host='', password='', zones=[], names={})\n\n\ndef test_zone_address():\n    assert rb.zone_address(3) == 'zone3'\n    assert len(rb.zone_address(40)) <= 14\n\n\ndef test_cmd_int_value():\n    assert rb._cmd_int({'value': '12'}) == 12\n    assert rb._cmd_int({'value': 7.0}) == 7\n\n\ndef test_cmd_int_query_fallback():\n    assert rb._cmd_int({'query': {'': '5'}}) == 5\n    assert rb._cmd_int({'query': {'duration': '9'}}) == 9\n\n\ndef test_cmd_int_missing_or_bad():\n    assert rb._cmd_int(None) is None\n    assert rb._cmd_int({}) is None\n    assert rb._cmd_int({'value': 'abc'}) is None\n\n\ndef test_clamp():\n    assert rb._clamp(500, 10, 200) == 200\n    assert rb._clamp(-1, 0, 14) == 0\n    assert rb._clamp(30, 1, 240) == 30\n\n\ndef test_zone_names_and_defaults():\n    _reset()\n    rb.set_zone_names(FakePoly(), {'zone_names': [\n        {'zone': 1.0, 'name': '  Front Lawn '},\n        {'zone': 2, 'name': ''},\n    ]})\n    assert rb.zone_name(1) == 'Front Lawn'\n    assert rb.zone_name(2) == 'Zone 2'\n    assert rb.zone_name(3) == 'Zone 3'\n\n\ndef test_zone_names_bad_input_is_ignored():\n    _reset()\n    rb.set_zone_names(FakePoly(), None)\n    assert rb.zone_name(1) == 'Zone 1'\n    rb.set_zone_names(FakePoly(), {'zone_names': [{'zone': 'x', 'name': 'Oops'}]})\n    assert rb.zone_name(1) == 'Zone 1'\n\n\ndef test_classify():\n    class RainbirdApiException(Exception):\n        pass\n\n    class RainbirdAuthException(RainbirdApiException):\n        pass\n\n    class RainbirdCodingException(Exception):\n        pass\n\n    class RainbirdDeviceBusyException(RainbirdApiException):\n        pass\n\n    assert rb._classify(RainbirdAuthException()) == 'auth'\n    assert rb._classify(RainbirdCodingException()) == 'password'\n    assert rb._classify(RainbirdDeviceBusyException()) == 'busy'\n    assert rb._classify(RainbirdApiException()) == 'network'\n    assert rb._classify(TimeoutError()) == 'network'\n    assert rb._classify(AttributeError('x')) == 'bug'\n\n\ndef test_three_password_failures_pause_for_sixteen_minutes():\n    _reset()\n    rb._record_failure('password')\n    rb._record_failure('password')\n    assert not rb._blocked()\n    rb._record_failure('password')\n    assert rb._blocked()\n    assert 15 * 60 < rb._S['blocked_until'] - time.time() <= 16 * 60\n    assert rb._S['pending_notice']\n    # after the pause a single further failure pauses again\n    assert rb._S['fail_pw'] == rb.FAILURES_BEFORE_PAUSE - 1\n\n\ndef test_explicit_auth_rejection_pauses_until_settings_saved():\n    _reset()\n    rb._record_failure('auth')\n    assert rb._blocked()\n    assert rb._S['blocked_until'] == float('inf')\n    rb.configure(FakePoly_with_notices(), 'h', 'p')\n    assert not rb._blocked()\n\n\ndef test_three_network_failures_pause_for_two_minutes():\n    _reset()\n    for _ in range(3):\n        rb._record_failure('network')\n    assert rb._blocked()\n    assert 100 < rb._S['blocked_until'] - time.time() <= 120\n\n\ndef test_busy_and_bug_do_not_count():\n    _reset()\n    for _ in range(5):\n        rb._record_failure('busy')\n        rb._record_failure('bug')\n    assert not rb._blocked()\n    assert rb._S['fail_pw'] == 0 and rb._S['fail_net'] == 0\n\n\nclass FakeNotices(dict):\n    def delete(self, key):\n        self.pop(key, None)\n\n\nclass FakePoly_with_notices(FakePoly):\n    def __init__(self):\n        self.Notices = FakeNotices()\n\n\nclass FakeController:\n    address = 'ctl'\n\n    def __init__(self, name):\n        self.name = name\n        self.renamed_to = None\n\n    def rename(self, new_name):\n        self.renamed_to = new_name\n\n\ndef test_cleanup_foreign_removes_only_other_plugins_notices_and_renames():\n    poly = FakePoly_with_notices()\n    poly.Notices['midea_conn'] = 'old NetHome Plus banner'\n    poly.Notices['config'] = 'mine'\n    poly.Notices['rainbird'] = 'mine too'\n    ctl = FakeController('NetHome Plus Controller')\n    rb.cleanup_foreign(poly, ctl)\n    assert set(poly.Notices) == {'config', 'rainbird'}\n    assert ctl.renamed_to == 'Rain Bird Plugin'\n    assert ctl.name == 'Rain Bird Plugin'\n\n\ndef test_cleanup_foreign_leaves_correct_name_alone():\n    poly = FakePoly_with_notices()\n    ctl = FakeController('Rain Bird Plugin')\n    rb.cleanup_foreign(poly, ctl)\n    assert ctl.renamed_to is None\n\n\ndef test_call_retries_busy_then_succeeds(monkeypatch):\n    _reset()\n\n    class RainbirdDeviceBusyException(Exception):\n        pass\n\n    class Fake:\n        calls = 0\n\n        async def get_rain_delay(self):\n            Fake.calls += 1\n            if Fake.calls < 3:\n                raise RainbirdDeviceBusyException()\n            return 4\n\n    rb._S.update(host='h', password='p', ctrl=Fake())\n    monkeypatch.setattr(rb.time, 'sleep', lambda seconds: None)\n    assert rb.call('get_rain_delay') == 4\n    assert Fake.calls == 3\n\n\ndef test_call_refuses_when_not_configured():\n    _reset()\n    try:\n        rb.call('get_rain_delay')\n        assert False, 'expected RuntimeError'\n    except RuntimeError:\n        pass\n"
+  },
+  "custom_param_docs": "<h2>Rain Bird plugin configuration</h2>\n<p>This plugin talks <b>directly</b> to your Rain Bird WiFi module (LNK) over your home network. No Rain Bird cloud account is used. There are only two settings: <b>host</b> and <b>password</b>. There is no user name or email.</p>\n\n<h3>host</h3>\n<p>The IP address of the Rain Bird WiFi module, for example <code>192.168.1.50</code>.</p>\n<ul>\n  <li>Find it in your router's list of connected devices (look for a device named like <i>Rain Bird</i> or <i>LNK</i>).</li>\n  <li><b>Strongly recommended:</b> give the module a DHCP reservation (fixed address) in your router so the address never changes.</li>\n  <li>Enter just the address - no <code>http://</code> and no trailing slash.</li>\n</ul>\n\n<h3>password</h3>\n<p>The password you set for the controller in the Rain Bird app when you added it. It is the same password the app uses to talk to the controller locally.</p>\n<p><b>Careful:</b> some Rain Bird modules lock out local access for 15 minutes after 3 wrong passwords. To avoid that, this plugin stops polling after repeated password-type failures and shows a notice instead of retrying. Fix the password and save to try again.</p>\n\n<h3>Zone names</h3>\n<p>Use the <b>Zone names</b> list (below the fields above) to give each zone a friendly name, for example zone <code>1</code> = <code>Front Lawn</code>. Zones you do not list are called \"Zone 1\", \"Zone 2\", and so on. Renaming takes effect on the existing nodes right away.</p>\n\n<h3>Good to know</h3>\n<ul>\n  <li>The controller can only talk to <b>one app at a time</b>. If you open the Rain Bird app while watering is being controlled here you may see a brief \"busy\" message in the plugin log; the plugin retries automatically.</li>\n  <li>Zone status is checked every 30 seconds; rain delay, rain sensor and water budget every 5 minutes.</li>\n  <li>Water budget is shown for information only; change it in the Rain Bird app.</li>\n  <li>If the controller drops off the network now and then, try putting the WiFi module on a dedicated 2.4 GHz-only network.</li>\n</ul>",
+  "custom_typed_params": [
+    {
+      "name": "zone_names",
+      "title": "Zone names",
+      "desc": "Optional friendly names for your sprinkler zones. Add one row per zone you want to name.",
+      "isList": true,
+      "params": [
+        {
+          "name": "zone",
+          "title": "Zone number",
+          "type": "NUMBER",
+          "isRequired": true,
+          "desc": "The station number on the controller (1, 2, 3 ...)."
+        },
+        {
+          "name": "name",
+          "title": "Zone name",
+          "type": "STRING",
+          "isRequired": true,
+          "desc": "What you want this zone to be called, e.g. Front Lawn."
+        }
+      ]
+    }
+  ],
+  "controller_class": "Controller",
+  "controller_module": "plugin",
+  "version": "1.0.2"
+}

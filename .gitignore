@@ -1,0 +1,24 @@
+# Plugin identity (private key / certificate issued by the eisy)
+*.key
+*.cert
+*.pem
+*.crt
+
+# Logs (DEBUG logs can contain the Rain Bird password)
+logs/
+*.log
+crash.log
+
+# Runtime / local files
+NSplugin_*.lock
+svc.pid
+*.pid
+*.lock
+persist/
+data/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.iox_env
+.vscode/

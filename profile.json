@@ -1,0 +1,267 @@
+{
+  "editors": [
+    {
+      "id": "rb_zone_state",
+      "ranges": [
+        {
+          "uom": "25",
+          "subset": "0,1",
+          "names": {
+            "0": "Off",
+            "1": "Running"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rb_unit_state",
+      "ranges": [
+        {
+          "uom": "25",
+          "subset": "0,1",
+          "names": {
+            "0": "Idle",
+            "1": "Watering"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rb_rain_sensor",
+      "ranges": [
+        {
+          "uom": "25",
+          "subset": "0,1",
+          "names": {
+            "0": "Clear",
+            "1": "Rain Detected"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rb_run_minutes",
+      "ranges": [
+        {
+          "uom": "45",
+          "min": 1,
+          "max": 240,
+          "step": 1,
+          "prec": 0
+        }
+      ]
+    },
+    {
+      "id": "rb_delay_days",
+      "ranges": [
+        {
+          "uom": "10",
+          "min": 0,
+          "max": 14,
+          "step": 1,
+          "prec": 0
+        }
+      ]
+    },
+    {
+      "id": "rb_budget_pct",
+      "ranges": [
+        {
+          "uom": "51",
+          "min": 0,
+          "max": 200,
+          "step": 1,
+          "prec": 0
+        }
+      ]
+    },
+    {
+      "id": "rb_program",
+      "ranges": [
+        {
+          "uom": "25",
+          "subset": "0,1,2,3",
+          "names": {
+            "0": "Program A",
+            "1": "Program B",
+            "2": "Program C",
+            "3": "Program D"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ED_CONTROLLER_ST",
+      "ranges": [
+        {
+          "subset": "0,1",
+          "uom": "25",
+          "names": {
+            "0": "Not Connected",
+            "1": "Connected"
+          }
+        }
+      ]
+    }
+  ],
+  "nodedefs": [
+    {
+      "id": "controller",
+      "name": "Rain Bird Plugin",
+      "properties": [
+        {
+          "id": "ST",
+          "name": "Status",
+          "editor": "ED_CONTROLLER_ST"
+        }
+      ],
+      "cmds": {
+        "sends": [],
+        "accepts": [
+          {
+            "id": "DISCOVER",
+            "name": "Discover",
+            "native": "false"
+          }
+        ]
+      },
+      "links": {
+        "ctl": [],
+        "rsp": []
+      }
+    },
+    {
+      "id": "rbunit",
+      "name": "Rain Bird Controller",
+      "properties": [
+        {
+          "id": "ST",
+          "name": "Watering",
+          "editor": "rb_unit_state"
+        },
+        {
+          "id": "DELAY",
+          "name": "Rain Delay",
+          "editor": "rb_delay_days"
+        },
+        {
+          "id": "RAIN_SENSOR",
+          "name": "Rain Sensor",
+          "editor": "rb_rain_sensor"
+        },
+        {
+          "id": "WATER_BUDGET",
+          "name": "Water Budget",
+          "editor": "rb_budget_pct"
+        }
+      ],
+      "cmds": {
+        "sends": [],
+        "accepts": [
+          {
+            "id": "STOP_ALL",
+            "name": "Stop All Watering",
+            "native": "false"
+          },
+          {
+            "id": "SET_DELAY",
+            "name": "Set Rain Delay",
+            "native": "false",
+            "parameters": [
+              {
+                "id": "",
+                "editor": "rb_delay_days",
+                "optional": false,
+                "init": "DELAY"
+              }
+            ]
+          },
+          {
+            "id": "RUN_PROGRAM",
+            "name": "Run Program",
+            "native": "false",
+            "parameters": [
+              {
+                "id": "",
+                "editor": "rb_program",
+                "optional": false
+              }
+            ]
+          }
+        ]
+      },
+      "links": {
+        "ctl": [],
+        "rsp": []
+      }
+    },
+    {
+      "id": "rbzone",
+      "name": "Rain Bird Zone",
+      "properties": [
+        {
+          "id": "ST",
+          "name": "Zone State",
+          "editor": "rb_zone_state"
+        },
+        {
+          "id": "DUR",
+          "name": "Run Time",
+          "editor": "rb_run_minutes"
+        }
+      ],
+      "cmds": {
+        "sends": [
+          {
+            "id": "DON",
+            "name": "On",
+            "native": "true"
+          },
+          {
+            "id": "DOF",
+            "name": "Off",
+            "native": "true"
+          }
+        ],
+        "accepts": [
+          {
+            "id": "DON",
+            "name": "Run Zone",
+            "native": "true",
+            "parameters": [
+              {
+                "id": "",
+                "editor": "rb_run_minutes",
+                "optional": true,
+                "init": "DUR"
+              }
+            ]
+          },
+          {
+            "id": "DOF",
+            "name": "Stop Watering",
+            "native": "true"
+          },
+          {
+            "id": "SET_DUR",
+            "name": "Set Run Time",
+            "native": "false",
+            "parameters": [
+              {
+                "id": "",
+                "editor": "rb_run_minutes",
+                "optional": false,
+                "init": "DUR"
+              }
+            ]
+          }
+        ]
+      },
+      "links": {
+        "ctl": [],
+        "rsp": []
+      }
+    }
+  ],
+  "linkdefs": []
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Rain Bird",
+  "status": "active",
+  "developer": "jdturneriii@outlook.com",
+  "author": "Jim Turner",
+  "purchaseOptions": [],
+  "type": "python3",
+  "path": "/usr/home/eisy-ai/generated_plugins/rainbird",
+  "executable": "main.py",
+  "runAs": "admin",
+  "install": "install.sh",
+  "desc": "Local-network control of Rain Bird sprinkler controllers (ESP-Me and other LNK WiFi models) using the pyrainbird library: zone on/off with run time, stop all, rain delay, rain sensor, water budget (read-only) and program start.",
+  "customParams": "{\"host\": \"\", \"password\": \"\"}",
+  "discover": true,
+  "fileUpload": false,
+  "isyAccess": false,
+  "requireEisyui": false,
+  "shortPoll": 30,
+  "longPoll": 300,
+  "nsid": "8c153d36-ddd6-4a55-a1f6-0ccb1227773b"
+}
